@@ -204,6 +204,18 @@ cython_debug/
 # Temporary file for partial code execution
 tempCodeRunnerFile.py
 
+# Virtual environment
+myenv/
+
+# ML artifacts (model & preprocessor binaries)
+artifacts/
+
+# CatBoost training info
+catboost_info/
+
+# Logs
+logs/
+
 # Ruff stuff:
 .ruff_cache/
 
