@@ -10,19 +10,47 @@
     />
     <style>
         body { background-color: #f8f9fa; }
-        .card { max-width: 600px; margin: 40px auto; padding: 30px; border-radius: 12px; }
+        .main-card {
+            max-width: 640px;
+            margin: 40px auto;
+            padding: 30px;
+            border-radius: 12px;
+        }
+        .history-card {
+            max-width: 960px;
+            margin: 0 auto 50px auto;
+            border-radius: 12px;
+        }
         h1 { font-size: 1.5rem; }
-        .result-box { background: #e9f7ef; border-radius: 8px; padding: 16px; margin-top: 20px; }
+        .result-box {
+            background: #e9f7ef;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .badge-best {
+            background-color: #198754;
+            color: white;
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 20px;
+            margin-left: 6px;
+        }
+        .table th { background-color: #343a40; color: white; }
+        .score-cell { font-weight: bold; color: #0d6efd; }
+        .newest-row { background-color: #fff3cd; }
     </style>
 </head>
 <body>
 <div class="container">
-    <div class="card shadow">
+
+    <!-- ── PREDICTION FORM ─────────────────────────────────────────────── -->
+    <div class="card shadow main-card">
         <h1 class="text-center mb-4">Student Exam Performance Prediction</h1>
 
         <form action="{{ url_for('predict_datapoint') }}" method="post">
 
-            <!-- Gender -->
             <div class="mb-3">
                 <label class="form-label">Gender</label>
                 <select class="form-select" name="gender" required>
@@ -32,7 +60,6 @@
                 </select>
             </div>
 
-            <!-- Race / Ethnicity -->
             <div class="mb-3">
                 <label class="form-label">Race or Ethnicity</label>
                 <select class="form-select" name="ethnicity" required>
@@ -45,7 +72,6 @@
                 </select>
             </div>
 
-            <!-- Parental Education -->
             <div class="mb-3">
                 <label class="form-label">Parental Level of Education</label>
                 <select class="form-select" name="parental_level_of_education" required>
@@ -59,7 +85,6 @@
                 </select>
             </div>
 
-            <!-- Lunch -->
             <div class="mb-3">
                 <label class="form-label">Lunch Type</label>
                 <select class="form-select" name="lunch" required>
@@ -69,7 +94,6 @@
                 </select>
             </div>
 
-            <!-- Test Preparation Course -->
             <div class="mb-3">
                 <label class="form-label">Test Preparation Course</label>
                 <select class="form-select" name="test_preparation_course" required>
@@ -79,42 +103,95 @@
                 </select>
             </div>
 
-            <!-- Reading Score -->
             <div class="mb-3">
                 <label class="form-label">Reading Score (out of 100)</label>
-                <input
-                    class="form-control"
-                    type="number"
-                    name="reading_score"
-                    placeholder="Enter your Reading Score"
-                    min="0" max="100" required
-                />
+                <input class="form-control" type="number" name="reading_score"
+                    placeholder="Enter your Reading Score" min="0" max="100" required />
             </div>
 
-            <!-- Writing Score -->
             <div class="mb-3">
                 <label class="form-label">Writing Score (out of 100)</label>
-                <input
-                    class="form-control"
-                    type="number"
-                    name="writing_score"
-                    placeholder="Enter your Writing Score"
-                    min="0" max="100" required
-                />
+                <input class="form-control" type="number" name="writing_score"
+                    placeholder="Enter your Writing Score" min="0" max="100" required />
             </div>
 
             <div class="d-grid">
-                <button type="submit" class="btn btn-primary">Predict Maths Score</button>
+                <button type="submit" class="btn btn-primary btn-lg">
+                    Predict Maths Score
+                </button>
             </div>
         </form>
 
+        <!-- ── PREDICTION RESULT ──────────────────────────────────────── -->
         {% if results is defined and results is not none %}
-        <div class="result-box text-center">
-            <h4>Predicted Maths Score: <strong>{{ "%.2f" | format(results) }}</strong></h4>
+        <div class="result-box">
+            <h4>Predicted Maths Score:
+                <strong>{{ "%.2f" | format(results) }}</strong> / 100
+            </h4>
         </div>
         {% endif %}
-
     </div>
+
+    <!-- ── PREDICTION HISTORY TABLE ───────────────────────────────────── -->
+    {% if history and history | length > 0 %}
+    <div class="card shadow history-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">📋 Recent Predictions
+                <span class="badge bg-secondary">last {{ history | length }}</span>
+            </h5>
+            <small class="text-muted">Newest first</small>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered mb-0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Time</th>
+                            <th>Gender</th>
+                            <th>Ethnicity</th>
+                            <th>Lunch</th>
+                            <th>Test Prep</th>
+                            <th>Reading</th>
+                            <th>Writing</th>
+                            <th>Predicted Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in history %}
+                        <tr class="{{ 'newest-row' if loop.first else '' }}">
+                            <td>{{ loop.index }}</td>
+                            <td><small>{{ row.timestamp }}</small></td>
+                            <td>{{ row.gender }}</td>
+                            <td>{{ row.ethnicity }}</td>
+                            <td>{{ row.lunch }}</td>
+                            <td>
+                                {% if row.test_prep == 'completed' %}
+                                    <span class="badge bg-success">completed</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">none</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ row.reading_score }}</td>
+                            <td>{{ row.writing_score }}</td>
+                            <td class="score-cell">
+                                {{ "%.2f" | format(row.predicted_score) }}
+                                {% if loop.first %}
+                                    <span class="badge-best">latest</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer text-muted text-center">
+            <small>History is saved in <code>artifacts/prediction_history.csv</code></small>
+        </div>
+    </div>
+    {% endif %}
+
 </div>
 </body>
 </html>
