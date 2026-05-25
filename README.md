@@ -8,7 +8,7 @@
 
 ## 🔗 Live Demo
 
-> Deployed on Render → [https://your-render-url.onrender.com](https://your-render-url.onrender.com)
+> Deployed on Render → [https://student-performance-ml-mp4w.onrender.com](https://student-performance-ml-mp4w.onrender.com)
 
 ---
 
