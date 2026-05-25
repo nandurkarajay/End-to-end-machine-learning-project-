@@ -234,8 +234,4 @@ The build command trains the model on every deploy. The start command serves the
 **Ajay Nandurkar**
 - GitHub: [@nandurkarajay](https://github.com/nandurkarajay)
 
----
 
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
