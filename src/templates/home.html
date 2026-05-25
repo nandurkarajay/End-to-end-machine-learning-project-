@@ -1,452 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"/>
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>EduPredict — Predict Maths Score</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"/>
+    <title>Student Exam Performance Indicator</title>
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    />
     <style>
-        :root {
-            --primary: #4f46e5;
-            --primary-dark: #3730a3;
-            --accent: #06b6d4;
-            --dark: #0f172a;
-            --card-bg: #1e293b;
-            --border: rgba(255,255,255,0.08);
-            --input-bg: #0f172a;
-        }
-        * { box-sizing: border-box; }
-        body {
-            background: var(--dark);
-            color: #e2e8f0;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            min-height: 100vh;
-        }
-
-        /* ── NAVBAR ── */
-        .navbar {
-            background: rgba(15,23,42,0.97);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border);
-            padding: 14px 0;
-            position: sticky; top: 0; z-index: 100;
-        }
-        .navbar-brand {
-            font-size: 1.2rem; font-weight: 700;
-            color: white !important;
-            display: flex; align-items: center; gap: 8px;
-        }
-        .brand-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
-        .nav-link-custom { color: #94a3b8; font-size: 0.9rem; text-decoration: none; }
-        .nav-link-custom:hover { color: white; }
-        .btn-nav {
-            background: var(--primary); color: white;
-            border: none; border-radius: 8px;
-            padding: 8px 18px; font-size: 0.85rem;
-            text-decoration: none;
-        }
-
-        /* ── PAGE HEADER ── */
-        .page-header {
-            background: linear-gradient(135deg, rgba(79,70,229,0.12) 0%, rgba(6,182,212,0.06) 100%);
-            border-bottom: 1px solid var(--border);
-            padding: 40px 0 32px;
-        }
-        .page-header h1 { font-size: 1.8rem; font-weight: 700; color: white; }
-        .page-header p { color: #64748b; font-size: 0.95rem; margin-top: 6px; }
-        .breadcrumb-item { color: #64748b; font-size: 0.85rem; }
-        .breadcrumb-item a { color: var(--accent); text-decoration: none; }
-        .breadcrumb-item.active { color: #94a3b8; }
-        .breadcrumb-item + .breadcrumb-item::before { color: #475569; }
-
-        /* ── CARDS ── */
-        .glass-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            overflow: hidden;
-        }
-        .card-header-custom {
-            background: rgba(255,255,255,0.03);
-            border-bottom: 1px solid var(--border);
-            padding: 18px 24px;
-            display: flex; align-items: center; gap: 10px;
-        }
-        .card-header-custom h5 { color: white; font-weight: 600; margin: 0; font-size: 1rem; }
-        .card-header-icon {
-            width: 34px; height: 34px; border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1rem;
-        }
-
-        /* ── FORM ── */
-        .form-body { padding: 24px; }
-        .form-label { color: #94a3b8; font-size: 0.85rem; font-weight: 500; margin-bottom: 6px; }
-        .form-select, .form-control {
-            background: var(--input-bg);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: #e2e8f0;
-            border-radius: 8px;
-            padding: 10px 14px;
-            font-size: 0.9rem;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        .form-select:focus, .form-control:focus {
-            background: var(--input-bg);
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79,70,229,0.2);
-            color: white;
-            outline: none;
-        }
-        .form-select option { background: #1e293b; color: #e2e8f0; }
-        .section-divider {
-            color: #475569; font-size: 0.75rem; font-weight: 600;
-            text-transform: uppercase; letter-spacing: 0.08em;
-            margin: 20px 0 14px;
-            display: flex; align-items: center; gap: 10px;
-        }
-        .section-divider::after {
-            content: ''; flex: 1;
-            height: 1px; background: var(--border);
-        }
-        .btn-predict {
-            background: linear-gradient(135deg, var(--primary), #6366f1);
-            color: white; border: none; border-radius: 10px;
-            padding: 13px 28px; font-size: 0.95rem; font-weight: 600;
-            width: 100%; transition: all 0.2s;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
-        .btn-predict:hover {
-            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
-            transform: translateY(-1px);
-            box-shadow: 0 8px 24px rgba(79,70,229,0.35);
-        }
-
-        /* ── RESULT BOX ── */
-        .result-box {
-            margin: 0 24px 24px;
-            background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(6,182,212,0.08));
-            border: 1px solid rgba(16,185,129,0.3);
-            border-radius: 12px; padding: 20px 24px;
-            display: flex; align-items: center; gap: 16px;
-        }
-        .result-icon {
-            width: 52px; height: 52px; border-radius: 12px;
-            background: rgba(16,185,129,0.15);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; flex-shrink: 0;
-        }
-        .result-label { color: #6ee7b7; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
-        .result-score { font-size: 2rem; font-weight: 800; color: white; line-height: 1.1; }
-        .result-sub { color: #64748b; font-size: 0.8rem; margin-top: 2px; }
-
-        /* ── HISTORY TABLE ── */
-        .history-section { margin-top: 32px; }
-        .table-dark-custom { width: 100%; border-collapse: collapse; }
-        .table-dark-custom thead th {
-            background: rgba(255,255,255,0.04);
-            color: #64748b; font-size: 0.75rem;
-            font-weight: 600; text-transform: uppercase;
-            letter-spacing: 0.06em; padding: 12px 16px;
-            border-bottom: 1px solid var(--border);
-            white-space: nowrap;
-        }
-        .table-dark-custom tbody td {
-            padding: 12px 16px;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
-            font-size: 0.875rem; color: #cbd5e1;
-            vertical-align: middle;
-        }
-        .table-dark-custom tbody tr:hover td { background: rgba(255,255,255,0.03); }
-        .table-dark-custom tbody tr:last-child td { border-bottom: none; }
-        .newest-row td { background: rgba(79,70,229,0.08) !important; }
-        .score-pill {
-            background: rgba(79,70,229,0.15);
-            color: #a5b4fc; border-radius: 20px;
-            padding: 3px 12px; font-weight: 700; font-size: 0.85rem;
-            display: inline-block;
-        }
-        .score-pill.high { background: rgba(16,185,129,0.15); color: #6ee7b7; }
-        .score-pill.mid  { background: rgba(245,158,11,0.15);  color: #fcd34d; }
-        .score-pill.low  { background: rgba(239,68,68,0.15);   color: #fca5a5; }
-        .badge-prep-done { background: rgba(16,185,129,0.15); color: #6ee7b7; border-radius: 6px; padding: 2px 8px; font-size: 0.75rem; }
-        .badge-prep-none { background: rgba(100,116,139,0.2);  color: #94a3b8; border-radius: 6px; padding: 2px 8px; font-size: 0.75rem; }
-        .latest-tag {
-            background: var(--primary); color: white;
-            border-radius: 4px; padding: 1px 7px;
-            font-size: 0.7rem; font-weight: 600;
-            margin-left: 6px; vertical-align: middle;
-        }
-        .empty-history {
-            text-align: center; padding: 48px 24px;
-            color: #475569;
-        }
-        .empty-history i { font-size: 2.5rem; margin-bottom: 12px; display: block; }
-
-        /* ── FOOTER ── */
-        footer {
-            border-top: 1px solid var(--border);
-            padding: 24px 0; text-align: center;
-            color: #475569; font-size: 0.8rem; margin-top: 60px;
-        }
-        footer a { color: var(--accent); text-decoration: none; }
+        body { background-color: #f8f9fa; }
+        .card { max-width: 600px; margin: 40px auto; padding: 30px; border-radius: 12px; }
+        h1 { font-size: 1.5rem; }
+        .result-box { background: #e9f7ef; border-radius: 8px; padding: 16px; margin-top: 20px; }
     </style>
 </head>
 <body>
+<div class="container">
+    <div class="card shadow">
+        <h1 class="text-center mb-4">Student Exam Performance Prediction</h1>
 
-<!-- NAVBAR -->
-<nav class="navbar">
-    <div class="container">
-        <a class="navbar-brand" href="/">
-            <span class="brand-dot"></span> EduPredict
-        </a>
-        <div class="d-flex align-items-center gap-3 ms-auto">
-            <a href="/" class="nav-link-custom d-none d-md-inline">Home</a>
-            <a href="/dataset" class="nav-link-custom d-none d-md-inline">Dataset</a>
-            <a href="/predictdata" class="btn-nav">Predict</a>
-        </div>
-    </div>
-</nav>
+        <form action="{{ url_for('predict_datapoint') }}" method="post">
 
-<!-- PAGE HEADER -->
-<div class="page-header">
-    <div class="container">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-2">
-                <li class="breadcrumb-item"><a href="/">Home</a></li>
-                <li class="breadcrumb-item active">Predict</li>
-            </ol>
-        </nav>
-        <h1><i class="bi bi-lightning-charge-fill me-2" style="color:var(--accent)"></i>Maths Score Predictor</h1>
-        <p>Fill in the student details below to get an instant ML-powered prediction.</p>
-    </div>
-</div>
-
-<div class="container py-4">
-    <div class="row g-4">
-
-        <!-- ── LEFT: PREDICTION FORM ── -->
-        <div class="col-lg-5">
-            <div class="glass-card">
-                <div class="card-header-custom">
-                    <div class="card-header-icon" style="background:rgba(79,70,229,0.15); color:#a5b4fc;">
-                        <i class="bi bi-person-fill"></i>
-                    </div>
-                    <h5>Student Details</h5>
-                </div>
-
-                <form action="{{ url_for('predict_datapoint') }}" method="post" class="form-body">
-
-                    <div class="section-divider">Demographics</div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Gender</label>
-                        <select class="form-select" name="gender" required>
-                            <option selected disabled value="">Select Gender</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Race / Ethnicity</label>
-                        <select class="form-select" name="ethnicity" required>
-                            <option selected disabled value="">Select Ethnicity</option>
-                            <option value="group A">Group A</option>
-                            <option value="group B">Group B</option>
-                            <option value="group C">Group C</option>
-                            <option value="group D">Group D</option>
-                            <option value="group E">Group E</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Parental Level of Education</label>
-                        <select class="form-select" name="parental_level_of_education" required>
-                            <option selected disabled value="">Select Education Level</option>
-                            <option value="associate's degree">Associate's Degree</option>
-                            <option value="bachelor's degree">Bachelor's Degree</option>
-                            <option value="high school">High School</option>
-                            <option value="master's degree">Master's Degree</option>
-                            <option value="some college">Some College</option>
-                            <option value="some high school">Some High School</option>
-                        </select>
-                    </div>
-
-                    <div class="section-divider">Academic Info</div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Lunch Type</label>
-                        <select class="form-select" name="lunch" required>
-                            <option selected disabled value="">Select Lunch Type</option>
-                            <option value="free/reduced">Free / Reduced</option>
-                            <option value="standard">Standard</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Test Preparation Course</label>
-                        <select class="form-select" name="test_preparation_course" required>
-                            <option selected disabled value="">Select Status</option>
-                            <option value="none">Not Completed</option>
-                            <option value="completed">Completed</option>
-                        </select>
-                    </div>
-
-                    <div class="row g-3 mb-4">
-                        <div class="col-6">
-                            <label class="form-label">Reading Score</label>
-                            <div class="input-group">
-                                <input class="form-control" type="number" name="reading_score"
-                                    placeholder="0–100" min="0" max="100" required/>
-                                <span class="input-group-text" style="background:#1e293b; border-color:rgba(255,255,255,0.1); color:#64748b;">/100</span>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label">Writing Score</label>
-                            <div class="input-group">
-                                <input class="form-control" type="number" name="writing_score"
-                                    placeholder="0–100" min="0" max="100" required/>
-                                <span class="input-group-text" style="background:#1e293b; border-color:rgba(255,255,255,0.1); color:#64748b;">/100</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn-predict">
-                        <i class="bi bi-lightning-charge-fill"></i> Predict Maths Score
-                    </button>
-                </form>
-
-                <!-- RESULT -->
-                {% if results is defined and results is not none %}
-                <div class="result-box">
-                    <div class="result-icon">🎯</div>
-                    <div>
-                        <div class="result-label">Predicted Maths Score</div>
-                        <div class="result-score">{{ "%.2f" | format(results) }} <span style="font-size:1rem; color:#64748b; font-weight:400;">/ 100</span></div>
-                        <div class="result-sub">
-                            {% if results >= 75 %}🟢 Strong performance predicted
-                            {% elif results >= 50 %}🟡 Average performance predicted
-                            {% else %}🔴 Below average — consider extra support
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-
-        <!-- ── RIGHT: HISTORY TABLE ── -->
-        <div class="col-lg-7">
-            <div class="glass-card history-section" style="margin-top:0;">
-                <div class="card-header-custom">
-                    <div class="card-header-icon" style="background:rgba(6,182,212,0.15); color:#67e8f9;">
-                        <i class="bi bi-clock-history"></i>
-                    </div>
-                    <h5>Prediction History</h5>
-                    {% if history and history | length > 0 %}
-                    <span class="ms-auto badge" style="background:rgba(79,70,229,0.2); color:#a5b4fc; border-radius:20px; padding:4px 12px; font-size:0.75rem;">
-                        {{ history | length }} records
-                    </span>
-                    {% endif %}
-                </div>
-
-                {% if history and history | length > 0 %}
-                <div class="table-responsive">
-                    <table class="table-dark-custom">
-                        <thead>
-                            <tr>
-                                <th>Time</th>
-                                <th>Gender</th>
-                                <th>Ethnicity</th>
-                                <th>Lunch</th>
-                                <th>Test Prep</th>
-                                <th>Read</th>
-                                <th>Write</th>
-                                <th>Score</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for row in history %}
-                            <tr class="{{ 'newest-row' if loop.first else '' }}">
-                                <td style="color:#64748b; font-size:0.78rem;">{{ row.timestamp[11:16] }}<br><span style="font-size:0.72rem;">{{ row.timestamp[:10] }}</span></td>
-                                <td>
-                                    {% if row.gender == 'male' %}
-                                        <i class="bi bi-gender-male" style="color:#60a5fa;"></i> Male
-                                    {% else %}
-                                        <i class="bi bi-gender-female" style="color:#f472b6;"></i> Female
-                                    {% endif %}
-                                </td>
-                                <td>{{ row.ethnicity }}</td>
-                                <td>
-                                    {% if row.lunch == 'standard' %}
-                                        <span style="color:#6ee7b7; font-size:0.8rem;">● Standard</span>
-                                    {% else %}
-                                        <span style="color:#fca5a5; font-size:0.8rem;">● Free/Red</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if row.test_prep == 'completed' %}
-                                        <span class="badge-prep-done"><i class="bi bi-check2"></i> Done</span>
-                                    {% else %}
-                                        <span class="badge-prep-none">None</span>
-                                    {% endif %}
-                                </td>
-                                <td>{{ row.reading_score | int }}</td>
-                                <td>{{ row.writing_score | int }}</td>
-                                <td>
-                                    {% set s = row.predicted_score %}
-                                    <span class="score-pill {{ 'high' if s >= 75 else ('mid' if s >= 50 else 'low') }}">
-                                        {{ "%.1f" | format(s) }}
-                                    </span>
-                                    {% if loop.first %}
-                                        <span class="latest-tag">NEW</span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                <div style="padding:12px 16px; border-top:1px solid var(--border); text-align:right;">
-                    <small style="color:#475569;">
-                        <i class="bi bi-info-circle me-1"></i>
-                        Showing last {{ history | length }} predictions · Saved to <code style="color:#64748b;">artifacts/prediction_history.csv</code>
-                    </small>
-                </div>
-
-                {% else %}
-                <div class="empty-history">
-                    <i class="bi bi-clock-history" style="color:#334155;"></i>
-                    <p style="color:#475569; font-size:0.9rem;">No predictions yet.</p>
-                    <p style="color:#334155; font-size:0.8rem;">Submit the form to see your prediction history here.</p>
-                </div>
-                {% endif %}
+            <!-- Gender -->
+            <div class="mb-3">
+                <label class="form-label">Gender</label>
+                <select class="form-select" name="gender" required>
+                    <option selected disabled value="">Select your Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
             </div>
 
-            <!-- SCORE LEGEND -->
-            <div class="glass-card mt-3 p-3">
-                <div class="d-flex gap-3 flex-wrap align-items-center">
-                    <small style="color:#64748b; font-weight:600;">Score Legend:</small>
-                    <span class="score-pill high" style="font-size:0.78rem;">≥ 75 Strong</span>
-                    <span class="score-pill mid"  style="font-size:0.78rem;">50–74 Average</span>
-                    <span class="score-pill low"  style="font-size:0.78rem;">&lt; 50 Needs Support</span>
-                    <small style="color:#475569; ms-auto;">Model: Random Forest · R²=0.85 · MAE=4.65</small>
-                </div>
+            <!-- Race / Ethnicity -->
+            <div class="mb-3">
+                <label class="form-label">Race or Ethnicity</label>
+                <select class="form-select" name="ethnicity" required>
+                    <option selected disabled value="">Select Ethnicity</option>
+                    <option value="group A">Group A</option>
+                    <option value="group B">Group B</option>
+                    <option value="group C">Group C</option>
+                    <option value="group D">Group D</option>
+                    <option value="group E">Group E</option>
+                </select>
             </div>
+
+            <!-- Parental Education -->
+            <div class="mb-3">
+                <label class="form-label">Parental Level of Education</label>
+                <select class="form-select" name="parental_level_of_education" required>
+                    <option selected disabled value="">Select Parent Education</option>
+                    <option value="associate's degree">associate's degree</option>
+                    <option value="bachelor's degree">bachelor's degree</option>
+                    <option value="high school">high school</option>
+                    <option value="master's degree">master's degree</option>
+                    <option value="some college">some college</option>
+                    <option value="some high school">some high school</option>
+                </select>
+            </div>
+
+            <!-- Lunch -->
+            <div class="mb-3">
+                <label class="form-label">Lunch Type</label>
+                <select class="form-select" name="lunch" required>
+                    <option selected disabled value="">Select Lunch Type</option>
+                    <option value="free/reduced">free/reduced</option>
+                    <option value="standard">standard</option>
+                </select>
+            </div>
+
+            <!-- Test Preparation Course -->
+            <div class="mb-3">
+                <label class="form-label">Test Preparation Course</label>
+                <select class="form-select" name="test_preparation_course" required>
+                    <option selected disabled value="">Select Course Status</option>
+                    <option value="none">None</option>
+                    <option value="completed">Completed</option>
+                </select>
+            </div>
+
+            <!-- Reading Score -->
+            <div class="mb-3">
+                <label class="form-label">Reading Score (out of 100)</label>
+                <input
+                    class="form-control"
+                    type="number"
+                    name="reading_score"
+                    placeholder="Enter your Reading Score"
+                    min="0" max="100" required
+                />
+            </div>
+
+            <!-- Writing Score -->
+            <div class="mb-3">
+                <label class="form-label">Writing Score (out of 100)</label>
+                <input
+                    class="form-control"
+                    type="number"
+                    name="writing_score"
+                    placeholder="Enter your Writing Score"
+                    min="0" max="100" required
+                />
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Predict Maths Score</button>
+            </div>
+        </form>
+
+        {% if results is defined and results is not none %}
+        <div class="result-box text-center">
+            <h4>Predicted Maths Score: <strong>{{ "%.2f" | format(results) }}</strong></h4>
         </div>
+        {% endif %}
 
     </div>
 </div>
-
-<!-- FOOTER -->
-<footer>
-    <div class="container">
-        <p>EduPredict · Built with Flask, Scikit-learn & Bootstrap 5</p>
-        <p class="mt-1"><a href="/">Home</a> · <a href="/dataset">Dataset</a></p>
-    </div>
-</footer>
-
 </body>
 </html>
